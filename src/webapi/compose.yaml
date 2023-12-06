@@ -1,0 +1,23 @@
+version: "3.4"
+
+services:
+  mysql:
+    image: mysql:8.2.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'vaxidrez'
+      MYSQL_PASSWORD: 'VaxiDrez2005$$'
+      MYSQL_ROOT_PASSWORD: 'VaxiDrez2005$$'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+volumes:
+  mysql_data:
+    driver: local
+networks:
+  default:
+    name: bankingNetwork

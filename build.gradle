@@ -1,0 +1,74 @@
+buildscript {
+    ext {
+        springBootVersion = '3.2.0'
+        lombokVersion = '1.18.30'
+        javaCompatibilityVersion = JavaVersion.VERSION_17
+        groupId = 'com.jescompany'
+        artifactProjectCommon = 'pizzeria.orders'
+        javaMainClass = 'webapi.MainApplication'
+        projectVersion = '1.0.0'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id "org.flywaydb.flyway" version "10.1.0"
+    id 'org.springframework.boot' version "${springBootVersion}" apply false
+}
+
+allprojects {
+    group = groupId
+    version = projectVersion
+
+    java {
+        targetCompatibility = javaCompatibilityVersion
+        sourceCompatibility = javaCompatibilityVersion
+    }
+
+    compileJava {
+        sourceCompatibility = javaCompatibilityVersion
+        targetCompatibility = javaCompatibilityVersion
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'io.spring.dependency-management'
+
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.spring.io/release" }
+        maven { url "https://repository.jboss.org/maven2" }
+        jcenter()
+    }
+
+    dependencies {
+        implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+
+        // Lombok
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+        testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+        implementation "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}"
+
+        // Map struct
+        implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+        annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+        annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+        tasks.withType(JavaCompile).configureEach {
+            options.encoding = 'UTF-8'
+            options.compilerArgs = ['-Amapstruct.suppressGeneratorTimestamp=true', '-Amapstruct.verbose=true']
+        }
+    }
+
+    configurations {
+        compileOnly { extendsFrom annotationProcessor }
+        testCompileOnly { extendsFrom annotationProcessor }
+        testAnnotationProcessor { extendsFrom annotationProcessor }
+    }
+}

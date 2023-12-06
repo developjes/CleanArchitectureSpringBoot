@@ -1,0 +1,36 @@
+rootProject.name = 'com.jescompany'
+
+/* include modules */
+def srcRootDir
+rootDir.eachDir{rd ->
+    if(rd.name == 'src') srcRootDir = rd
+}
+
+if(srcRootDir == null) throw new IllegalArgumentException("src directory not found")
+
+def artifactId = 'pizzeria.orders'
+def dirs = ['webapi', 'domain', 'infrastructure', 'application']
+
+srcRootDir.eachDir { principalSubDir ->
+    if(dirs.contains(principalSubDir.name)) {
+        if(principalSubDir.name == dirs[3]) {
+            def applicationDirs = ['dto', 'interfaces', 'usecase', 'validation']
+
+            principalSubDir.eachDir { applicationSubDir ->
+                if(applicationDirs.contains(applicationSubDir.name)) {
+                    include ":${artifactId}.${dirs[3]}.${applicationSubDir.name}"
+                    project(":${artifactId}.${dirs[3]}.${applicationSubDir.name}").projectDir = file(applicationSubDir.path)
+                }
+            }
+        }
+        else {
+            include ":${artifactId}.${principalSubDir.name}"
+            project(":${artifactId}.${principalSubDir.name}").projectDir = file(principalSubDir.path)
+        }
+    }
+}
+
+/*
+for (project in rootProject.children)
+    println(project.name)
+ */
